@@ -4,6 +4,7 @@ import axios from 'axios';
 import Search from './Search';
 import Table from './Table';
 import Loading from './Loading';
+import Login from './Login/Login';
 
 import './App.css';
 
@@ -16,11 +17,8 @@ const PARAM_SEARCH = 'query=';
 const PARAM_PAGE = 'page=';
 const PARAM_HPP = 'hitsPerPage=';
 
-const withLoading = Component => ({isLoading, ...rest}) =>
-  isLoading
-    ? <Loading />
-    : <Component {...rest} />
-;
+const withLoading = Component => ({ isLoading, ...rest }) =>
+  isLoading ? <Loading /> : <Component {...rest} />;
 
 const TableWithLoading = withLoading(Table);
 
@@ -32,19 +30,25 @@ class App extends Component {
 
     this.state = {
       results: null,
-      searchKey: "",
+      searchKey: '',
       searchTerm: DEFAULT_QUERY,
       error: null,
       isLoading: false,
+      click: 0 // Add click state
     };
   }
 
   onDismiss = objectID => {
     const isNotId = item => item.objectID !== objectID;
-    const updatedHits = this.state.results[this.state.searchKey].hits.filter(isNotId);
+    const updatedHits = this.state.results[this.state.searchKey].hits.filter(
+      isNotId
+    );
     this.setState({
       results: {
-        [this.state.searchKey]: { ...this.state.results[this.state.searchKey], hits: updatedHits }
+        [this.state.searchKey]: {
+          ...this.state.results[this.state.searchKey],
+          hits: updatedHits
+        }
       }
     });
   };
@@ -65,9 +69,9 @@ class App extends Component {
     this.setState({
       results: {
         ...results,
-        [searchKey]: { hits: updatedHits, page },
+        [searchKey]: { hits: updatedHits, page }
       },
-      isLoading: false,
+      isLoading: false
     });
   };
 
@@ -84,21 +88,25 @@ class App extends Component {
 
   fetchSearchTopStories = (searchTerm, page = 0) => {
     this.setState({ isLoading: true });
-    axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
+    axios(
+      `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
+    )
       .then(result => {
-          // Limit the number of articles to 90
-          const limitedResult = { ...result.data, hits: result.data.hits.slice(0, 90) };
-          this._isMounted && this.setSearchTopStories(limitedResult);
+        // Limit the number of articles to 90
+        const limitedResult = {
+          ...result.data,
+          hits: result.data.hits.slice(0, 90)
+        };
+        this._isMounted && this.setSearchTopStories(limitedResult);
       })
       .catch(error => this._isMounted && this.setState({ error }));
-};
-
+  };
 
   componentDidMount() {
     this._isMounted = true;
 
     const { searchTerm } = this.state;
-    this.setState({ searchKey: searchTerm});
+    this.setState({ searchKey: searchTerm });
 
     this.fetchSearchTopStories(searchTerm);
   }
@@ -111,6 +119,11 @@ class App extends Component {
     return !this.state.results[searchTerm];
   };
 
+  // Update the click state
+  updateClickState = click => {
+    this.setState({ click });
+  };
+
   render() {
     const {
       searchTerm,
@@ -118,8 +131,10 @@ class App extends Component {
       results,
       error,
       isLoading,
+      click // Add click state
     } = this.state;
-    const list = (results && results[searchKey] && results[searchKey].hits) || [];
+    const list =
+      (results && results[searchKey] && results[searchKey].hits) || [];
 
     return (
       <div className="page">
@@ -128,24 +143,28 @@ class App extends Component {
             searchTerm={searchTerm}
             onChange={this.onSearchChange}
             onSubmit={this.onSearchSubmit}
+            onClick={this.updateClickState} // Pass the callback function
           >
             Search
           </Search>
         </div>
-        {
-          error ? (
-            <div className="interactions">
-              <p>Something went wrong!</p>
-            </div>
-          ) : (
-            <React.Fragment>
+        {click === 1 ? (
+          <Login /> // Render Login component if click is 1
+        ) : (
+          <React.Fragment>
+            {error ? (
+              <div className="interactions">
+                <p>Something went wrong!</p>
+              </div>
+            ) : (
               <TableWithLoading
                 list={list}
                 onDismiss={this.onDismiss}
                 isLoading={isLoading}
               />
-            </React.Fragment>
-          )}
+            )}
+          </React.Fragment>
+        )}
       </div>
     );
   }

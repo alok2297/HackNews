@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Search({ searchTerm, onChange, children: text, onSubmit }) {
-  const nevigate = useNavigate();
+function Search({ searchTerm, onChange, children: text, onSubmit, onClick }) {
+  const navigate = useNavigate();
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -12,8 +12,10 @@ function Search({ searchTerm, onChange, children: text, onSubmit }) {
   }, []);
 
   const handleClick = () => {
+    // Call the onClick callback with the click value
+    onClick(1);
     // Navigate to the Login page
-    nevigate("/login");
+    navigate("/login");
   };
 
   return (

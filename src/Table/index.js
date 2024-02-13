@@ -6,6 +6,38 @@ import './index.css';
 import Button from "../Button/index";
 
 const Table = ({ list, onDismiss }) => {
+
+  const handleClick = async (newsId) => {
+    console.log(newsId);
+    const item = localStorage.getItem("isAuthenticated");
+    const userId = localStorage.getItem("userId");
+    if(item==="true"){
+      console.log("Hey I am Alok");
+      console.log(userId);
+    }
+
+    try {
+      const response = await fetch('/api/add-to-hashset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, newsId })
+      });
+  
+      if (response.status === 200) {
+        console.log("News ID added to HashSet successfully");
+        // Handle success
+      } else {
+        console.error("Failed to add news ID to HashSet");
+        // Handle failure
+      }
+    } catch (error) {
+      console.error("Error occurred while adding news ID to HashSet:", error);
+      // Handle error
+    }
+
+  }
   return (
     <div className="table">
       <div className="table-header">
@@ -21,7 +53,6 @@ const Table = ({ list, onDismiss }) => {
             <a
               href={item.url}
               title="Title"
-              target="_blank"
             >
               {item.title || item.story_title}
             </a>
@@ -47,6 +78,7 @@ const Table = ({ list, onDismiss }) => {
           <span className="item-dismiss">
             <Button
               className="button-inline"
+              onClick={() => handleClick(item.objectID)}
             >
               Dismiss
             </Button>
