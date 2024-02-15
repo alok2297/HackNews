@@ -12,17 +12,17 @@ const Login = () => {
     setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleClick = async (e) => {
+
+    const handleClick = async (e) => {
     console.log(credentials);
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:5000/api/register", credentials);
-      console.log(res);
-      const data = await res.json();
       if (res.status === 201) { // Check for the correct status code
         console.log("logged Successfully");
         localStorage.setItem("isAuthenticated","true");
-        localStorage.setItem("userId", data.userId);
+        console.log(res.data.username);
+        localStorage.setItem("userId", res.data.username);
         navigate("/");
       }
     } catch (err) {

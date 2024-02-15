@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { useNavigate } from 'react-router-dom';
 import './index.css';
 
 import Button from "../Button/index";
 
 const Table = ({ list, onDismiss }) => {
+  const navigate = useNavigate();
 
   const handleClick = async (newsId) => {
     console.log(newsId);
@@ -15,9 +16,12 @@ const Table = ({ list, onDismiss }) => {
       console.log("Hey I am Alok");
       console.log(userId);
     }
+    else{
+      navigate("/");
+    }
 
     try {
-      const response = await fetch('/api/add-to-hashset', {
+      const response = await fetch('/api/hashset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
