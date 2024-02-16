@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import './index.css';
@@ -6,7 +6,29 @@ import './index.css';
 import Button from "../Button/index";
 
 const Table = ({ list, onDismiss }) => {
+  const [hashSet, setHashSet] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+
+    if (isAuthenticated === "true") {
+      // Fetch hashSet data from the backend
+      const id = localStorage.getItem("userId");
+      fetch(`http://localhost:5000/api/user/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          // Update hashSet state with the fetched data
+          setHashSet(data.hashSet);
+        })
+        .catch(error => console.error('Error fetching hashSet:', error));
+    }
+  }, []); 
+
+  const filteredList = list.filter(item => hashSet && !hashSet.includes(item.objectID));
+
+
 
   const handleClick = async (newsId) => {
     console.log(newsId);
@@ -21,7 +43,7 @@ const Table = ({ list, onDismiss }) => {
     }
 
     try {
-      const response = await fetch('/api/hashset', {
+      const response = await fetch('http://localhost:5000/api/hashset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -51,7 +73,7 @@ const Table = ({ list, onDismiss }) => {
         <span className="item-points-header">Upvotes</span>
         <span className="item-action-header">Action</span>
       </div>
-      {list.map(item =>
+      {filteredList.map(item =>
         <div key={item.objectID} className="table-row">
           <span className="item-title">
             <a

@@ -21,8 +21,8 @@ const Login = () => {
       if (res.status === 201) { // Check for the correct status code
         console.log("logged Successfully");
         localStorage.setItem("isAuthenticated","true");
-        console.log(res.data.username);
-        localStorage.setItem("userId", res.data.username);
+        console.log(res.data._id);
+        localStorage.setItem("userId", res.data._id);
         navigate("/");
       }
     } catch (err) {
