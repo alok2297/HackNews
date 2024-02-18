@@ -20,13 +20,15 @@ const Table = ({ list, onDismiss }) => {
         .then(response => response.json())
         .then(data => {
           // Update hashSet state with the fetched data
-          setHashSet(data.hashSet);
+          setHashSet(data.user.hashSet);
+          console.log(data.user.hashSet);
         })
         .catch(error => console.error('Error fetching hashSet:', error));
     }
   }, []); 
 
   const filteredList = list.filter(item => hashSet && !hashSet.includes(item.objectID));
+  console.log(filteredList);
 
 
 
